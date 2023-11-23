@@ -117,20 +117,21 @@ def president_parle_Nation(matrice):
     liste_mots=list(IDF.keys())
     liste_président=[]
     president_qui_a_plus_de_nation=""
+    indice_nation=0
     for i in range(len(liste_mots)):
         if liste_mots[i]=="nation":
-            indice=i
+            indice_nation=i
             break
-    max=matrice[i][0]
-    for j in range(len(matrice[i])):
-        if matrice[i][j] != None:
+    max=matrice[indice_nation][0]
+    for j in range(len(matrice[indice_nation])):
+        if matrice[indice_nation][j] != None:
             name=directory[j][11:-4]
             name=prenom(name)
             name=name[0]+" "+name[1]
             if name not in liste_président :
                 liste_président.append(name)
-            if matrice[i][j]<max :
-                max=matrice[i][j]
+            if matrice[indice_nation][j]<max :
+                max=matrice[indice_nation][j]
                 president_qui_a_plus_de_nation=liste_président[-1]
     return liste_président,president_qui_a_plus_de_nation
 
@@ -141,11 +142,11 @@ def president_ecologie(matrice,liste_années,liste_nom):
     for i in range(len(directory)):
         if matrice[indice_climat][i]!=None:
             Liste_apparition_ecologie.append(i)
-    min_annee=Liste_apparition_ecologie[0]
+    indice_min_annee=Liste_apparition_ecologie[0]
     for indice in Liste_apparition_ecologie:
-        if liste_années[indice]<min_annee:
-            min_annee=indice
-    return "C'est " + liste_nom[min_annee] + " en " + str(liste_années[indice])
+        if liste_années[indice]<liste_années[indice_min_annee]:
+            indice_min_annee=indice
+    return "C'est " + liste_nom[indice_min_annee] + " en " + str(liste_années[indice_min_annee])
 
 def mots_evoques_par_tous(matrice):
     Liste_cles=list(IDF.keys())

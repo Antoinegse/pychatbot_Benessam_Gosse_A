@@ -67,41 +67,49 @@ class InterfaceGraphique:
                 resultat+=nom+"\n"
         elif numero_bouton==2:
             text=mots_peu_importants(Matrice_TF_IDF)
+            indice=0
             for i in range(0,len(text),4):
                 if len(text)-i>=4:
                     resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+"\n"
-            for j in range(len(text)-i-4):
-                resultat+=text[i-4+j]+" " 
+                indice=i
+            for j in range(len(text)-indice-4):
+                resultat+=text[indice-4+j]+" " 
         elif numero_bouton==3:
             text=mots_importants(Matrice_TF_IDF)
+            indice=0
             for i in range(0,len(text),4):
                 if len(text)-i>=4:
                     resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+"\n"
-            for j in range(len(text)-i-4):
-                resultat+=text[i-4+j]+" " 
+                indice=i
+            for j in range(len(text)-indice-4):
+                resultat+=text[indice-4+j]+" " 
         elif numero_bouton==4:
             text=mot_repetes_par_Chirac(Matrice_TF_IDF)
+            indice=0
             for i in range(0,len(text),4):
                 if len(text)-i>=4:
                     resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+"\n"
-            for j in range(len(text)-i-4):
-                resultat+=text[i-4+j]+" " 
+                indice=i
+            for j in range(len(text)-indice-4):
+                resultat+=text[indice-4+j]+" " 
         elif numero_bouton==5:
             text=list(president_parle_Nation(Matrice_TF_IDF))
             resultat=text[0][0]
             for i in range(1,len(text[0])-1):
                 resultat=resultat+", "+ text[0][i]
             resultat=resultat+" et "+text[0][-1]+" en ont parlé. "
-            resultat=resultat+"C'est "+text[1]+" qui en a le plus parlé."
+            resultat=resultat+"C'est "+text[1][0]+" qui en a le plus parlé."
         elif numero_bouton==6:
             resultat=president_ecologie(Matrice_TF_IDF,Liste_années_textes,Liste_nom_fichier)
         elif numero_bouton==7:
             text=mots_evoques_par_tous(Matrice_TF_IDF)
+            indice=0
             for i in range(0,len(text),4):
                 if len(text)-i>=4:
                     resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+"\n"
-            for j in range(len(text)-i-4):
-                resultat+=text[i-4+j]+" " 
+                indice=i
+            for j in range(len(text)-indice-4):
+                resultat+=text[indice-4+j]+" " 
         self.texte_rendu.delete("1.0", tk.END)  
         self.texte_rendu.insert(tk.END, resultat)
 
