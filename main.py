@@ -1,17 +1,17 @@
 import os
 import math
  
-def cleaning_directory(dossier):
+def cleaning_directory(dossier):  # Fonction prenant en argument un dossier de fichiers et renvoyant ces fichiers dépourvus de ponctuation et de majuscules.
     global directory
     directory=os.listdir(dossier)
     Liste_nom_president=[]
     for fichier in directory :
-        name=fichier[11:-4]
+        name=fichier[11:-4] # Permet de prendre uniquement le nom du président dans le titre du fichier
         Liste_nom_president=affichage(name,Liste_nom_president)
         file=open('speeches-20231108/'+ fichier,"r",encoding="utf-8")
         file_clean=open('cleaned/'+fichier[:-4]+"_cleaned.txt","w",encoding='utf-8')
         lignes=file.readlines()
-        for line in lignes:
+        for line in lignes: # "Nettoie" le fichier de la ponctuation et des majuscules
                 for lettre in line:
                     if lettre in ["à","è","é","ô","ù"]:
                         file_clean.write(chr(ord(lettre)))
@@ -24,18 +24,21 @@ def cleaning_directory(dossier):
     return Liste_nom_president
 
         
-def prenom(nom):
+def prenom(nom): # Fonction prenant en argument le nom d'un président et renvoyant ce dernier sans le chiffre qui le suit
     if nom[-1] in ["0","1","2","3","4","5","6","7","8","9"]:
             nom = nom[:-1]
     return Prenom_president[nom],nom
 
-def affichage(nom,liste):
+def affichage(nom : str,liste : list): #Fonction prenant en argument le nom d'un président et une liste, puis ajoute dans cette liste le prénom et le nom du président
     surname,nom=prenom(nom)
     denomination=surname+" "+nom
     if denomination not in liste:
         liste.append(denomination)
     return liste
 
+
+#Fonction prenant en argument une phrase et renvoyant le nombre d'occurences
+# des mots présents dans la phrase
 def fréquence(phrase : str,i):
     K=liste_TF[i]
     for mot in phrase.split() :
@@ -44,16 +47,14 @@ def fréquence(phrase : str,i):
         else :
             K[mot]=1
 
-def idf(m,i):
-    K=liste_TF[i]
-    for j in K.keys():
-        somme=0
-        for l in range(len(clean_directory)):
-                if j in liste_TF[l].keys():
-                    somme+=1
-        IDF[j] = round(math.log(len(directory)/somme),5)
+def idf(mot,i):
+    somme=0
+    for l in range(len(clean_directory)):
+        if mot in liste_TF[l].keys():
+            somme+=1
+    IDF[mot] = round(math.log(len(directory)/somme),5)
 
-def TF_IDF(dossier):
+def TF_IDF(dossier): #Fonction prenant en argument un dossier de fichiers et renvoyant une matrice
     M_TF_IDF=[]
     for i in range(len(dossier)):
         with open('cleaned/'+dossier[i],"r",encoding='utf-8') as f:
@@ -61,7 +62,7 @@ def TF_IDF(dossier):
             for e in lignes :
                 fréquence(e,i)
     for l in range(len(dossier)):
-        for k in liste_TF[i].keys():
+        for k in liste_TF[l].keys():
             idf(k,l)
     for mot in IDF.keys():
         L=[]
