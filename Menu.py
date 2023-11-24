@@ -97,7 +97,7 @@ class InterfaceGraphique:
             for i in range(1,len(text[0])-1):
                 resultat=resultat+", "+ text[0][i]
             resultat=resultat+" et "+text[0][-1]+" en ont parlé. "
-            resultat=resultat+"C'est "+text[1][0]+" qui en a le plus parlé."
+            resultat=resultat+"C'est "+str(text[1])+" qui en a le plus parlé."
         elif numero_bouton==6:
             resultat=president_ecologie(Matrice_TF_IDF,Liste_années_textes,Liste_nom_fichier)
         elif numero_bouton==7:

@@ -17,8 +17,10 @@ def cleaning_directory(dossier):
                 for lettre in line:
                     if lettre in ["à","è","é","ô","ù"]:
                         file_clean.write(chr(ord(lettre)))
-                    elif lettre in [".",",",";","?","!",":","'","-",'"']:
+                    elif lettre in [".",",",";","?","!",":","-",'"']:
                         file_clean.write(" ")
+                    elif lettre=="'":
+                        file_clean.write("e ")
                     else:
                         file_clean.write(lower(lettre))
         file.close()
@@ -26,7 +28,7 @@ def cleaning_directory(dossier):
     return Liste_nom_president
 
 def lower(lettre):
-    if 65<=ord(lettre)<=90:
+    if 65<=ord(lettre)<=90 or 192<=ord(lettre)<=223:
         return chr(ord(lettre)+32)
     else:
         return lettre
@@ -98,11 +100,13 @@ def mots_peu_importants(matrice):
     Liste_mot=[]
     for i in range(len(matrice)):
         moy=0
+        occ=0
         for j in range(len(clean_directory)):
             if matrice[i][j]!=None:
                 moy+=matrice[i][j]
-        moy/=len(clean_directory)
-        if moy<=0.2:
+                occ+=1
+        moy/=occ
+        if moy<=0.5:
             mots=list(IDF.keys())
             mot=mots[i]
             Liste_mot.append(mot)
@@ -204,4 +208,3 @@ Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing'
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
-
