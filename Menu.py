@@ -14,10 +14,6 @@ class InterfaceGraphique:
         # Barre de menus
         self.barre_menu = tk.Menu(self.fenetre)
         self.fenetre.config(menu=self.barre_menu)
-      
-        # Menu Fichier
-        menu_fichier = tk.Menu(self.barre_menu, tearoff=0)
-        self.barre_menu.add_cascade(label="Fichier", menu=menu_fichier)
         
         #Bouton quitter
         self.barre_menu.add_command(label="Quitter", command=self.quitter)
