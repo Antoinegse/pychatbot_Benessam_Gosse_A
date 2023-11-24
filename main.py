@@ -18,10 +18,16 @@ def cleaning_directory(dossier):  # Fonction prenant en argument un dossier de f
                     elif lettre in [".",",",";","?","!",":","'","-",'"']:
                         file_clean.write(" ")
                     else:
-                        file_clean.write(lettre.lower())
+                        file_clean.write(lower(lettre))
         file.close()
         file_clean.close()
     return Liste_nom_president
+
+def lower(lettre):
+    if 65<=ord(lettre)<=90:
+        return chr(ord(lettre)+32)
+    else:
+        return lettre
 
         
 def prenom(nom): # Fonction prenant en argument le nom d'un président et renvoyant ce dernier sans le chiffre qui le suit
