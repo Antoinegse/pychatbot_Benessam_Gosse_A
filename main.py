@@ -68,7 +68,7 @@ def idf(mot,i):
     for l in range(len(clean_directory)):
         if mot in liste_TF[l].keys():
             somme+=1
-    IDF[mot] = round(math.log(len(directory)/somme)+1,5)
+    IDF[mot] = round(math.log(len(directory)/somme),5)
 
 def TF_IDF(dossier):
     """Fonction prenant en argument un dossier de fichiers et renvoyant une matrice dans laquelle est présent le mot et son score tf idf selon le document
@@ -88,7 +88,7 @@ def TF_IDF(dossier):
             if mot in liste_TF[i].keys():
                 L.append(liste_TF[i][mot]*IDF[mot])
             else:
-                L.append(0)
+                L.append(None)
         M_TF_IDF.append(L)
     return M_TF_IDF
 
@@ -99,7 +99,7 @@ def mots_peu_importants(matrice):
     for i in range(len(matrice)):
         moy=0
         for j in range(len(clean_directory)):
-            if matrice[i][j]!=0:
+            if matrice[i][j]!=None:
                 moy+=matrice[i][j]
         moy/=len(clean_directory)
         if moy<=0.2:
@@ -115,7 +115,7 @@ def mots_importants(matrice):
     for i in range(len(matrice)):
         moy=0
         for j in range(len(clean_directory)):
-            if matrice[i][j]!=0:
+            if matrice[i][j]!=None:
                 moy+=matrice[i][j]
         moy/=len(clean_directory)
         if moy>=1:
@@ -130,9 +130,9 @@ def mot_repetes_par_Chirac(matrice):
     Liste_mots=list(IDF.keys())
     Liste_mots_repetes=[]
     for i in range(len(matrice)):
-        if matrice[i][0]!=0 and matrice[i][0]<=0.2 :
+        if matrice[i][0]!=None and matrice[i][0]<=0.2 :
             Liste_mots_repetes.append(Liste_mots[i])
-        elif matrice[i][1]!=0 and matrice[i][1]<=0.2:
+        elif matrice[i][1]!=None and matrice[i][1]<=0.2:
             if Liste_mots[i] not in Liste_mots_repetes:
                 Liste_mots_repetes.append(Liste_mots[i])
     return Liste_mots_repetes
@@ -169,7 +169,7 @@ def president_ecologie(matrice:list,liste_années:list,liste_nom:list):
     liste_clés=list(IDF.keys())
     indice_climat=liste_clés.index("climat")
     for i in range(len(directory)):
-        if matrice[indice_climat][i]!=0:
+        if matrice[indice_climat][i]!=None:
             Liste_apparition_ecologie.append(i)
     indice_min_annee=Liste_apparition_ecologie[0]
     for indice in Liste_apparition_ecologie:
@@ -184,7 +184,7 @@ def mots_evoques_par_tous(matrice:list):
     for i in range(len(matrice)):
         booleen=True
         for score in matrice[i]:
-            if score==0:
+            if score==None:
                 booleen=False
         if booleen:
             Liste_mot_evoques.append(Liste_cles[i])

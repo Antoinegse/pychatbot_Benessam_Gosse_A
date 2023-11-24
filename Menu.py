@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
 from main import*
-from main import*
 
 Liste_fonctions=["Liste des noms des présidents","Liste des mots les moins importants","Mots ayant le score TF-IDF le plus élevé","Mots les plus répétés par le président Chirac","Présidents qui ont parlé de la Nation et celui qui en a le plus parlé","Quel est le premier président a avoir parlé d'écologie ?","Quels sont les mots que tous les présidents ont évoqués"]
 n=len(Liste_fonctions)
