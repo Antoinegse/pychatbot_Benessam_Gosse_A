@@ -1,0 +1,1 @@
+Pour utiliser le programme, il suffit de lancer le fichier python "Menu.py". Vous aurez ensuite juste à cliquer sur le bouton qui correspond à la question que vous vous posez.
