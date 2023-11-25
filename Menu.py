@@ -55,12 +55,13 @@ class InterfaceGraphique:
         self.texte_rendu.pack(pady=50, padx=50)
 
     def action_bouton(self, numero_bouton):
+        """Fonction attribuant à chaque bouton une action associée à une fonctionnalité"""
         resultat = ""
-        if numero_bouton==1:
+        if numero_bouton==1: #Renvoie les noms des présidents
             resultat = "Les présidents sont : \n"
             for nom in Liste_nom_president:
                 resultat+=nom+"\n"
-        elif numero_bouton==2:
+        elif numero_bouton==2: #Renvoie les mots peu importants
             text=mots_peu_importants(Matrice_TF_IDF)
             indice=0
             for i in range(0,len(text),4):
@@ -69,7 +70,7 @@ class InterfaceGraphique:
                 indice=i
             for j in range(len(text)-indice-4):
                 resultat+=text[indice-4+j]+" " 
-        elif numero_bouton==3:
+        elif numero_bouton==3: #Renvoie les mots importants
             text=mots_importants(Matrice_TF_IDF)
             indice=0
             for i in range(0,len(text),4):
@@ -78,25 +79,25 @@ class InterfaceGraphique:
                 indice=i
             for j in range(len(text)-indice-4):
                 resultat+=text[indice-4+j]+" " 
-        elif numero_bouton==4:
+        elif numero_bouton==4: #Renvoie tous les mots prononcés par Chirac
             text=mot_repetes_par_Chirac(Matrice_TF_IDF)
             indice=0
-            for i in range(0,len(text),4):
-                if len(text)-i>=4:
+            for i in range(0,len(text),4): # Parcours de la liste 'text' par pas de 4
+                if len(text)-i>=4:# Ajout des 4 mots actuels à la chaîne résultat
                     resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+"\n"
-                indice=i
-            for j in range(len(text)-indice-4):
+                indice=i# Mise à jour de l'indice pour connaître la position du dernier groupe de 4 mots
+            for j in range(len(text)-indice-4): # Ajout des mots restants après le dernier groupe de 4 mots
                 resultat+=text[indice-4+j]+" " 
-        elif numero_bouton==5:
+        elif numero_bouton==5: # Renvoie les présidents ayant parlé de nation et celui qui en a le plus parlé
             text=list(president_parle_Nation(Matrice_TF_IDF))
             resultat=text[0][0]
             for i in range(1,len(text[0])-1):
                 resultat=resultat+", "+ text[0][i]
             resultat=resultat+" et "+text[0][-1]+" en ont parlé. "
             resultat=resultat+"C'est "+str(text[1])+" qui en a le plus parlé."
-        elif numero_bouton==6:
+        elif numero_bouton==6: #Renvoie le premier président ayant parlé d'écologie
             resultat=president_ecologie(Matrice_TF_IDF,Liste_années_textes,Liste_nom_fichier)
-        elif numero_bouton==7:
+        elif numero_bouton==7: #Renvoie les mots que tous les présidents ont prononcé
             text=mots_evoques_par_tous(Matrice_TF_IDF)
             indice=0
             for i in range(0,len(text),4):

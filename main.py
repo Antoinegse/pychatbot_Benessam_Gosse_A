@@ -1,5 +1,8 @@
 import os
 import math
+
+("IMPORTANT : pour les mots 'peu importants', nous avons décidé de leur affecter un score tf-idf de None, et non 0. C'est pour cela que dans la définition de la fonction "
+ "idf, on calcule le logarithme sans ajouter +1.)")
  
 def cleaning_directory(dossier):
     """Fonction prenant en argument un dossier de fichiers et renvoyant ces fichiers dépourvus de ponctuation et de majuscules.
@@ -27,7 +30,8 @@ def cleaning_directory(dossier):
         file_clean.close()
     return Liste_nom_president
 
-def lower(lettre):
+def lower(lettre:str):
+    """Fonction prenant en argument une lettre et renvoyant cette même lettre si c'est une minuscule, ou son équivalent en minuscule si c'est une majuscule."""
     if 65<=ord(lettre)<=90 or 192<=ord(lettre)<=223:
         return chr(ord(lettre)+32)
     else:
@@ -64,8 +68,8 @@ def fréquence(phrase : str,i:int):
 
 
 
-def idf(mot,i):
-    """Fonction prenant en argument un mot et un entier, puis calcule son score idf et l'ajoute au dictionnaire global IDF"""
+def idf(mot):
+    """Fonction prenant en argument un mot et un entier, calcule son score idf et l'ajoute au dictionnaire global IDF"""
     somme=0
     for l in range(len(clean_directory)):
         if mot in liste_TF[l].keys():
@@ -76,15 +80,15 @@ def TF_IDF(dossier):
     """Fonction prenant en argument un dossier de fichiers et renvoyant une matrice dans laquelle est présent le mot et son score tf idf selon le document
        -> list"""
     M_TF_IDF=[]
-    for i in range(len(dossier)):
+    for i in range(len(dossier)): #Cette double boucle permet de calculer le nombre d'occurences de chaque mot dans chaque document
         with open('cleaned/'+dossier[i],"r",encoding='utf-8') as f:
             lignes = f.readlines()
             for e in lignes :
                 fréquence(e,i)
-    for l in range(len(dossier)):
+    for l in range(len(dossier)): #Cette double boucle permet de calculer le score idf de chaque mot
         for k in liste_TF[l].keys():
-            idf(k,l)
-    for mot in IDF.keys():
+            idf(k)
+    for mot in IDF.keys(): # Ces boucles imbriquées permettent de créer une matrice et de lui ajouter chaque mot, ainsi que son score tf-idf
         L=[]
         for i in range(len(directory)):
             if mot in liste_TF[i].keys():
@@ -95,7 +99,7 @@ def TF_IDF(dossier):
     return M_TF_IDF
 
 def mots_peu_importants(matrice):
-    """Fonction prenant en argument une matrice et renvoyant les mots dont la moyenne des scores tf-idf est inférieure à 0,2
+    """Fonction prenant en argument une matrice et renvoyant les mots dont la moyenne des scores tf-idf est inférieure à 0,5
     -> list"""
     Liste_mot=[]
     for i in range(len(matrice)):
@@ -106,7 +110,7 @@ def mots_peu_importants(matrice):
                 moy+=matrice[i][j]
                 occ+=1
         moy/=occ
-        if moy<=0.5:
+        if moy<=0.2:
             mots=list(IDF.keys())
             mot=mots[i]
             Liste_mot.append(mot)
@@ -133,7 +137,7 @@ def mot_repetes_par_Chirac(matrice):
     -> list"""
     Liste_mots=list(IDF.keys())
     Liste_mots_repetes=[]
-    for i in range(len(matrice)):
+    for i in range(len(matrice)): #On ajoute tous les mots peu importants prononcés par Chirac à une liste
         if matrice[i][0]!=None and matrice[i][0]<=0.2 :
             Liste_mots_repetes.append(Liste_mots[i])
         elif matrice[i][1]!=None and matrice[i][1]<=0.2:
@@ -149,13 +153,13 @@ def president_parle_Nation(matrice):
     liste_président=[]
     president_qui_a_plus_de_nation=""
     indice_nation=0
-    for i in range(len(liste_mots)):
+    for i in range(len(liste_mots)): #On trouve l'endroit où se trouve le mot 'nation' dans la liste des mots.
         if liste_mots[i]=="nation":
             indice_nation=i
             break
     max=matrice[indice_nation][0]
-    for j in range(len(matrice[indice_nation])):
-        if matrice[indice_nation][j] != None:
+    for j in range(len(matrice[indice_nation])): #On parcourt la matrice à l'indice obtenu précédemment
+        if matrice[indice_nation][j] != None: #On donne le nom du président qui a prononcé le mot
             name=directory[j][11:-4]
             name=prenom(name)
             name=name[0]+" "+name[1]
@@ -169,20 +173,20 @@ def president_parle_Nation(matrice):
 def president_ecologie(matrice:list,liste_années:list,liste_nom:list):
     """Fonction renvoyant le nom du premier président qui a parlé d'écologie et/ou de climat, ainsi que l'année associée.
        -> str"""
-    Liste_apparition_ecologie=[]
+    Liste_apparition_ecologie=[] #Liste pour stocker les indices des textes où le mot climat apparaît
     liste_clés=list(IDF.keys())
     indice_climat=liste_clés.index("climat")
-    for i in range(len(directory)):
+    for i in range(len(directory)): #Parcours des textes
         if matrice[indice_climat][i]!=None:
             Liste_apparition_ecologie.append(i)
     indice_min_annee=Liste_apparition_ecologie[0]
-    for indice in Liste_apparition_ecologie:
+    for indice in Liste_apparition_ecologie: #Recherche de l'indice de l'année associée à la première mention du climat
         if liste_années[indice]<liste_années[indice_min_annee]:
             indice_min_annee=indice
     return "C'est " + liste_nom[indice_min_annee] + " en " + str(liste_années[indice_min_annee])
 
 def mots_evoques_par_tous(matrice:list):
-    """Fonction parcourant une matrice et renvoyant tous les mots ayant un score tf-idf différent """
+    """Fonction parcourant une matrice et renvoyant tous les mots ayant un score tf-idf différent de None, les mots présents dans tous les textes """
     Liste_cles=list(IDF.keys())
     Liste_mot_evoques=[]
     for i in range(len(matrice)):
@@ -190,7 +194,7 @@ def mots_evoques_par_tous(matrice:list):
         for score in matrice[i]:
             if score==None:
                 booleen=False
-        if booleen:
+        if booleen: #Si le mot a un score non nul, on l'ajoute à la liste renvoyée
             Liste_mot_evoques.append(Liste_cles[i])
     return Liste_mot_evoques    
     
