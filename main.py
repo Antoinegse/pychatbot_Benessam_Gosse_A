@@ -20,7 +20,7 @@ def cleaning_directory(dossier):
                 for lettre in line:
                     if lettre in ["à","è","é","ô","ù"]:
                         file_clean.write(chr(ord(lettre)))
-                    elif lettre in [".",",",";","?","!",":","-",'"']:
+                    elif lettre in [".",",",";","?","!",":","-",'"',"`"]:
                         file_clean.write(" ")
                     elif lettre=="'":
                         file_clean.write("e ")
@@ -102,15 +102,15 @@ def mots_peu_importants(matrice):
     """Fonction prenant en argument une matrice et renvoyant les mots dont la moyenne des scores tf-idf est inférieure à 0,5
     -> list"""
     Liste_mot=[]
-    for i in range(len(matrice)):
+    for i in range(len(matrice)): #Parcourt les différents lignes(soit les mots) de la matrice en argument
         moy=0
         occ=0
-        for j in range(len(clean_directory)):
+        for j in range(len(clean_directory)): #Parcourt les différents score d'un mot et fait la moyenne de ces scores ne comptant pas les scores nuls ici None
             if matrice[i][j]!=None:
                 moy+=matrice[i][j]
                 occ+=1
         moy/=occ
-        if moy<=0.2:
+        if moy<=0.5: #Les mots non importants sont ici les mots dont la moyenne de leurs scores est inférieure à 0.2
             mots=list(IDF.keys())
             mot=mots[i]
             Liste_mot.append(mot)
@@ -120,13 +120,15 @@ def mots_importants(matrice):
     """Fonction prenant en argument une matrice et renvoyant les mots dont la moyenne des scores tf-idf est supérieure à 1
     -> list"""
     Liste_mot=[]
-    for i in range(len(matrice)):
+    for i in range(len(matrice)): #Parcourt les différents lignes(soit les mots) de la matrice en argument
         moy=0
-        for j in range(len(clean_directory)):
+        occ=0
+        for j in range(len(clean_directory)): #Parcourt les différents score d'un mot et fait la moyenne de ces scores ne comptant pas les scores nuls ici None
             if matrice[i][j]!=None:
                 moy+=matrice[i][j]
-        moy/=len(clean_directory)
-        if moy>=1:
+                occ+=1
+        moy/=occ
+        if moy>=4.1: #Les mots importants sont ici les mots dont la moyenne de leurs scores est supérieure à 1
             mots=list(IDF.keys())
             mot=mots[i]
             Liste_mot.append(mot)

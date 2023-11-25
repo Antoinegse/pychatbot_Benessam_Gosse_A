@@ -73,12 +73,12 @@ class InterfaceGraphique:
         elif numero_bouton==3: #Renvoie les mots importants
             text=mots_importants(Matrice_TF_IDF)
             indice=0
-            for i in range(0,len(text),4):
-                if len(text)-i>=4:
-                    resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+"\n"
+            for i in range(0,len(text),6):
+                if len(text)-i>=6:
+                    resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+" "+text[i+4]+" "+text[i+5]+"\n"
                 indice=i
-            for j in range(len(text)-indice-4):
-                resultat+=text[indice-4+j]+" " 
+            for j in range(len(text)-indice-6):
+                resultat+=text[indice-6+j]+" " 
         elif numero_bouton==4: #Renvoie tous les mots prononcés par Chirac
             text=mot_repetes_par_Chirac(Matrice_TF_IDF)
             indice=0
