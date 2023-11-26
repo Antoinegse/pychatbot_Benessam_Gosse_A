@@ -1,4 +1,3 @@
-from main import *
 def mots_evoques_par_tous(matrice:list):
     """Fonction parcourant une matrice et renvoyant tous les mots ayant un score tf-idf différent de None, les mots présents dans tous les textes """
     Liste_cles=list(IDF.keys())
