@@ -1,4 +1,3 @@
-from main import *
 def president_parle_Nation(matrice):
     """Fonction prenant en argument une matrice, la parcourant et renvoyant le nom des présidents ayant prononcé
        le mot "nation" ainsi que le nom de celui qui l'a plus répété.
