@@ -140,9 +140,9 @@ def mot_repetes_par_Chirac(matrice):
     Liste_mots=list(IDF.keys())
     Liste_mots_repetes=[]
     for i in range(len(matrice)): #On ajoute tous les mots peu importants prononcés par Chirac à une liste
-        if matrice[i][0]!=None and matrice[i][0]<=0.2 :
+        if matrice[i][0]!=None and matrice[i][0]<=0.5:
             Liste_mots_repetes.append(Liste_mots[i])
-        elif matrice[i][1]!=None and matrice[i][1]<=0.2:
+        elif matrice[i][1]!=None and matrice[i][1]<=0.5:
             if Liste_mots[i] not in Liste_mots_repetes:
                 Liste_mots_repetes.append(Liste_mots[i])
     return Liste_mots_repetes
@@ -177,9 +177,16 @@ def president_ecologie(matrice:list,liste_années:list,liste_nom:list):
        -> str"""
     Liste_apparition_ecologie=[] #Liste pour stocker les indices des textes où le mot climat apparaît
     liste_clés=list(IDF.keys())
-    indice_climat=liste_clés.index("climat")
+    indice_climat=None
+    indice_ecologie=None
+    if "climat" in liste_clés:
+        indice_climat=liste_clés.index("climat")
+    if "écologie" in liste_clés:
+        indice_ecologie=liste_clés.index("écologie")
     for i in range(len(directory)): #Parcours des textes
-        if matrice[indice_climat][i]!=None:
+        if indice_climat!=None and matrice[indice_climat][i]!=None:
+            Liste_apparition_ecologie.append(i)
+        if indice_ecologie!=None and matrice[indice_ecologie][i]!=None:
             Liste_apparition_ecologie.append(i)
     indice_min_annee=Liste_apparition_ecologie[0]
     for indice in Liste_apparition_ecologie: #Recherche de l'indice de l'année associée à la première mention du climat
