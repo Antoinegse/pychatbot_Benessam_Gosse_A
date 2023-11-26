@@ -5,5 +5,3 @@ Gosse Antoine   Benessam Imrân
 Notre application possède les 6 fonctionnalités demandées dans le sujet.
 
 Pour utiliser le programme, il suffit de lancer le fichier python "Menu.py". Vous aurez ensuite juste à cliquer sur le bouton qui correspond à la question que vous vous posez, chaque bouton effectue une des 6 fonctionnalités demandées.
-
-https://github.com/Zestellar/pychatbot_Benessam_Gosse_A
