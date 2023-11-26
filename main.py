@@ -110,7 +110,7 @@ def mots_peu_importants(matrice):
                 moy+=matrice[i][j]
                 occ+=1
         moy/=occ
-        if moy<=0.5: #Les mots non importants sont ici les mots dont la moyenne de leurs scores est inférieure à 0.2
+        if moy<=0.5: #Les mots non importants sont ici les mots dont la moyenne de leurs scores est inférieure à 0.5
             mots=list(IDF.keys())
             mot=mots[i]
             Liste_mot.append(mot)
@@ -128,7 +128,7 @@ def mots_importants(matrice):
                 moy+=matrice[i][j]
                 occ+=1
         moy/=occ
-        if moy>=4.1: #Les mots importants sont ici les mots dont la moyenne de leurs scores est supérieure à 1
+        if moy>=4.2: #Les mots importants sont ici les mots dont la moyenne de leurs scores est supérieure à 4.2
             mots=list(IDF.keys())
             mot=mots[i]
             Liste_mot.append(mot)
