@@ -1,6 +1,3 @@
-from main import *
-
-
 def mots_importants(matrice):
     """Fonction prenant en argument une matrice et renvoyant les mots dont la moyenne des scores tf-idf est supérieure à 1
     -> list"""
