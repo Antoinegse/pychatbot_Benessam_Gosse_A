@@ -1,5 +1,5 @@
 def mot_repetes_par_Chirac(matrice):
-    """Fonction prenant en argument une matrice et renvoyant les mots répétés par Chirac ayant un score tf-idf inférieur à 0,2
+    """Fonction prenant en argument une matrice et renvoyant les mots répétés par Chirac ayant un score tf-idf inférieur à 0.5
     -> list"""
     Liste_mots=list(IDF.keys())
     Liste_mots_repetes=[]
