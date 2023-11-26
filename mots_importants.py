@@ -1,5 +1,5 @@
 def mots_importants(matrice):
-    """Fonction prenant en argument une matrice et renvoyant les mots dont la moyenne des scores tf-idf est supérieure à 1
+    """Fonction prenant en argument une matrice et renvoyant les mots dont la moyenne des scores tf-idf est supérieure à 4.2
     -> list"""
     Liste_mot=[]
     for i in range(len(matrice)): #Parcourt les différents lignes(soit les mots) de la matrice en argument
