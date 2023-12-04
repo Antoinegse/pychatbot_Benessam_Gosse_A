@@ -205,7 +205,52 @@ def mots_evoques_par_tous(matrice:list):
                 booleen=False
         if booleen: #Si le mot a un score non nul, on l'ajoute à la liste renvoyée
             Liste_mot_evoques.append(Liste_cles[i])
-    return Liste_mot_evoques    
+    return Liste_mot_evoques
+
+def Tokenisation(question):
+    mots_question = []
+    for e in question :
+        mots_question.append(e)
+    res = "Les mots sont : "
+    for i in mots_question :
+        res+= i
+    return res
+
+global mots_corpus
+mots_corpus = []
+def recherche_corpus(question):
+    global mots_corpus
+    dossier = "cleaned" #à modifier jsp où c'est
+    fichiers = os.listdir(dossier)
+    for fichiers in fichiers :
+        with open("fichier", "r") as f:
+            lignes = f.readlines()
+            for ligne in lignes :
+                for i in question :
+                     if i in ligne:
+                         mots_corpus.append(i)
+
+def vecteur_TF_IDF(question):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 
 global Prenom_president
