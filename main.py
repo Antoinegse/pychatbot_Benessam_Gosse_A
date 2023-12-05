@@ -57,14 +57,14 @@ def affichage(nom : str,liste : list):
 
 
 
-def fréquence(phrase : str,i:int):
+def fréquence(phrase : str, dico : dict):
     """Fonction prenant en argument une phrase et un entier, et remplissant le nombre d'occurences des mots présents dans la phrase dans la liste globale liste_TF"""
-    K=liste_TF[i]
     for mot in phrase.split() :
-        if mot in K.keys():
-            K[mot]+=1
+        if mot in dico.keys():
+            dico[mot]+=1
         else :
-            K[mot]=1
+            dico[mot]=1
+    return dico
 
 
 
@@ -84,7 +84,7 @@ def TF_IDF(dossier):
         with open('cleaned/'+dossier[i],"r",encoding='utf-8') as f:
             lignes = f.readlines()
             for e in lignes :
-                fréquence(e,i)
+                liste_TF[i]=fréquence(e,liste_TF[i])
     for l in range(len(dossier)): #Cette double boucle permet de calculer le score idf de chaque mot
         for k in liste_TF[l].keys():
             idf(k)
@@ -210,47 +210,43 @@ def mots_evoques_par_tous(matrice:list):
 def Tokenisation(question):
     mots_question = []
     for e in question :
-        mots_question.append(e)
-    res = "Les mots sont : "
-    for i in mots_question :
-        res+= i
-    return res
+        if e!=" ":
+            mots_question.append(e)
+    return mots_question
 
-global mots_corpus
-mots_corpus = []
 def recherche_corpus(question):
-    global mots_corpus
-    dossier = "cleaned" #à modifier jsp où c'est
+    mot_corpus=[]
+    dossier = "cleaned"
     fichiers = os.listdir(dossier)
-    for fichiers in fichiers :
-        with open("fichier", "r") as f:
+    for fichier in fichiers :
+        with open(fichier, "r") as f:
             lignes = f.readlines()
             for ligne in lignes :
                 for i in question :
                      if i in ligne:
-                         mots_corpus.append(i)
+                         mot_corpus.append(i)
+    return mot_corpus
 
-def vecteur_TF_IDF(question):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def vecteur_TF_IDF_question(question):
+    matrice_question=[[]for i in range(len(clean_directory))]
+    mots_questions=Tokenisation(question)
+    intersection=recherche_corpus(mots_questions)
+    TF_question={}
+    TF_question=fréquence(question,TF_question)
+    for mot in TF_question.keys():
+        TF_question[mot]/=len(mots_questions)
+    mot_hors_corpus=[]
+    for mot in set(mots_questions):
+        if mot not in intersection:
+            mot_hors_corpus.append(mot)
+    Liste_clés=list(IDF.keys())    
+    for i in range(len(Liste_clés)+len(mot_hors_corpus)):
+        for j in range(len(clean_directory)):
+            if (i<=len(IDF.keys())-len(mot_hors_corpus)) and (Liste_clés[i] in intersection):
+                matrice_question[j].append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
+            else:
+                matrice_question[j].append(0)
+    return matrice_question   
     
 
 global Prenom_president
