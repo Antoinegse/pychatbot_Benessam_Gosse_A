@@ -2,7 +2,7 @@ import os
 import math
 
 ("IMPORTANT : pour les mots 'peu importants', nous avons décidé de leur affecter un score tf-idf de None, et non 0. C'est pour cela que dans la définition de la fonction "
- "idf, on calcule le logarithme sans ajouter +1.)")
+"idf, on calcule le logarithme sans ajouter +1.)")
  
 def cleaning_directory(dossier):
     """Fonction prenant en argument un dossier de fichiers et renvoyant ces fichiers dépourvus de ponctuation et de majuscules.
@@ -17,18 +17,23 @@ def cleaning_directory(dossier):
         file_clean=open('cleaned/'+fichier[:-4]+"_cleaned.txt","w",encoding='utf-8')
         lignes=file.readlines()
         for line in lignes: # "Nettoie" le fichier de la ponctuation et des majuscules
-                for lettre in line:
-                    if lettre in ["à","è","é","ô","ù"]:
-                        file_clean.write(chr(ord(lettre)))
-                    elif lettre in [".",",",";","?","!",":","-",'"',"`"]:
-                        file_clean.write(" ")
-                    elif lettre=="'":
-                        file_clean.write("e ")
-                    else:
-                        file_clean.write(lower(lettre))
+            file_clean.write(traitement(line))  
         file.close()
         file_clean.close()
     return Liste_nom_president
+
+def traitement(line):
+    str=""
+    for lettre in line:
+        if lettre in ["à","è","é","ô","ù"]:
+            str+=lettre
+        elif lettre in [".",",",";","?","!",":","-",'"',"`"]:
+            str+=" "
+        elif lettre=="'":
+            str+="e "
+        else:
+            str+=lower(lettre)
+    return str
 
 def lower(lettre:str):
     """Fonction prenant en argument une lettre et renvoyant cette même lettre si c'est une minuscule, ou son équivalent en minuscule si c'est une majuscule."""
@@ -209,9 +214,8 @@ def mots_evoques_par_tous(matrice:list):
 
 def Tokenisation(question):
     mots_question = []
-    for e in question :
-        if e!=" ":
-            mots_question.append(e)
+    for mot in question.split():
+        mots_question.append(mot)
     return mots_question
 
 def recherche_corpus(question):
@@ -219,35 +223,75 @@ def recherche_corpus(question):
     dossier = "cleaned"
     fichiers = os.listdir(dossier)
     for fichier in fichiers :
-        with open(fichier, "r") as f:
+        with open(dossier+"/"+fichier, "r", encoding="utf-8") as f:
             lignes = f.readlines()
             for ligne in lignes :
-                for i in question :
-                     if i in ligne:
-                         mot_corpus.append(i)
+                for mot in question:
+                     if mot in ligne:
+                         mot_corpus.append(mot)
     return mot_corpus
 
 def vecteur_TF_IDF_question(question):
-    matrice_question=[[]for i in range(len(clean_directory))]
+    matrice_question=[]
+    question=str(traitement(question))      
     mots_questions=Tokenisation(question)
     intersection=recherche_corpus(mots_questions)
     TF_question={}
     TF_question=fréquence(question,TF_question)
     for mot in TF_question.keys():
-        TF_question[mot]/=len(mots_questions)
-    mot_hors_corpus=[]
-    for mot in set(mots_questions):
-        if mot not in intersection:
-            mot_hors_corpus.append(mot)
+        TF_question[mot]=round(TF_question[mot]/len(mots_questions),3)
     Liste_clés=list(IDF.keys())    
-    for i in range(len(Liste_clés)+len(mot_hors_corpus)):
-        for j in range(len(clean_directory)):
-            if (i<=len(IDF.keys())-len(mot_hors_corpus)) and (Liste_clés[i] in intersection):
-                matrice_question[j].append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
-            else:
-                matrice_question[j].append(0)
-    return matrice_question   
-    
+    for i in range(len(Liste_clés)):
+        if Liste_clés[i] in intersection:
+            matrice_question.append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
+        else:
+            matrice_question.append(0)
+    return matrice_question
+
+def transposée(matrice):
+    T_matrice=[[matrice[i][j] for i in range(len(matrice))] for j in range (len(matrice[0]))]
+    return T_matrice
+
+def prod_scalaire(vecteurA,vecteurB):
+    prod_sc=0
+    for i in range(len(vecteurA)):
+        if vecteurA[i]!=None and vecteurB[i]!=None:
+            prod_sc+=round(vecteurA[i]*vecteurB[i],3)
+    return prod_sc
+
+def norme(vecteur):
+    norme=0
+    for score in vecteur:
+        if score!=None:
+            norme+=score**2
+    norme=round(math.sqrt(norme),3)
+    return norme
+
+def similarité(vecteurA,vecteurB):
+    normeA=norme(vecteurA)
+    normeB=norme(vecteurB)
+    prod_sc=prod_scalaire(vecteurA,vecteurB)
+    simi=prod_sc/(normeA+normeB)
+    return simi
+
+def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
+    matrice_TF_IDF=transposée(matrice_TF_IDF)
+    L_simi=[]
+    for ligne in matrice_TF_IDF:
+        L_simi.append(similarité(ligne,matrice_question))
+    max=L_simi[0]
+    indice=0
+    for i in range(1,len(L_simi)):
+        if L_simi[i]>max:
+            max=L_simi[i]
+            indice=i
+    nom=dossier[indice]
+    nom=clean_vers_normale(nom)
+    return nom
+           
+def clean_vers_normale(fichier):
+    return fichier[:-12]+fichier[-4:]
+       
 
 global Prenom_president
 Prenom_president = {"Chirac":"Jacques","Mitterrand":"François","Macron":"Emmanuel",
@@ -262,3 +306,5 @@ Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing'
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
+Matrice_question=vecteur_TF_IDF_question("Qui a parlé de republique ?")
+print(meilleur_doc(Matrice_TF_IDF,Matrice_question,clean_directory))
