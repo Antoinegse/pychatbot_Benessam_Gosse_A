@@ -17,18 +17,23 @@ def cleaning_directory(dossier):
         file_clean=open('cleaned/'+fichier[:-4]+"_cleaned.txt","w",encoding='utf-8')
         lignes=file.readlines()
         for line in lignes: # "Nettoie" le fichier de la ponctuation et des majuscules
-                for lettre in line:
-                    if lettre in ["à","è","é","ô","ù"]:
-                        file_clean.write(chr(ord(lettre)))
-                    elif lettre in [".",",",";","?","!",":","-",'"',"`"]:
-                        file_clean.write(" ")
-                    elif lettre=="'":
-                        file_clean.write("e ")
-                    else:
-                        file_clean.write(lower(lettre))
+            file_clean.write(traitement(line))  
         file.close()
         file_clean.close()
     return Liste_nom_president
+
+def traitement(line):
+    str=""
+    for lettre in line:
+        if lettre in ["à","è","é","ô","ù"]:
+            str+=lettre
+        elif lettre in [".",",",";","?","!",":","-",'"',"`"]:
+            str+=" "
+        elif lettre=="'":
+            str+="e "
+        else:
+            str+=lower(lettre)
+    return str
 
 def lower(lettre:str):
     """Fonction prenant en argument une lettre et renvoyant cette même lettre si c'est une minuscule, ou son équivalent en minuscule si c'est une majuscule."""
@@ -209,9 +214,8 @@ def mots_evoques_par_tous(matrice:list):
 
 def Tokenisation(question):
     mots_question = []
-    for e in question :
-        if e!=" ":
-            mots_question.append(e)
+    for mot in question.split():
+        mots_question.append(mot)
     return mots_question
 
 def recherche_corpus(question):
@@ -219,34 +223,59 @@ def recherche_corpus(question):
     dossier = "cleaned"
     fichiers = os.listdir(dossier)
     for fichier in fichiers :
-        with open(fichier, "r") as f:
+        with open(dossier+"/"+fichier, "r", encoding="utf-8") as f:
             lignes = f.readlines()
             for ligne in lignes :
-                for i in question :
-                     if i in ligne:
-                         mot_corpus.append(i)
+                for mot in question:
+                     if mot in ligne:
+                         mot_corpus.append(mot)
     return mot_corpus
 
 def vecteur_TF_IDF_question(question):
     matrice_question=[[]for i in range(len(clean_directory))]
+    question=str(traitement(question))      
     mots_questions=Tokenisation(question)
     intersection=recherche_corpus(mots_questions)
     TF_question={}
     TF_question=fréquence(question,TF_question)
     for mot in TF_question.keys():
         TF_question[mot]/=len(mots_questions)
-    mot_hors_corpus=[]
-    for mot in set(mots_questions):
-        if mot not in intersection:
-            mot_hors_corpus.append(mot)
     Liste_clés=list(IDF.keys())    
-    for i in range(len(Liste_clés)+len(mot_hors_corpus)):
+    for i in range(len(Liste_clés)):
         for j in range(len(clean_directory)):
-            if (i<=len(IDF.keys())-len(mot_hors_corpus)) and (Liste_clés[i] in intersection):
+            if Liste_clés[i] in intersection:
                 matrice_question[j].append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
             else:
                 matrice_question[j].append(0)
-    return matrice_question   
+    return matrice_question
+
+def transosée(matrice):
+    T_matrice=[[matrice[i][j] for i in range(len(matrice))] for j in range (len(matrice[0]))]
+    return T_matrice
+
+def prod_scalaire(vecteurA,vecteurB):
+    prod_sc=0
+    for i in range(len(vecteurA)):
+        prod_sc+=round(vecteurA[i]*vecteurB[i],3)
+    return prod_sc
+
+def norme(vecteur):
+    norme=0
+    for score in vecteur:
+        norme+=score**2
+    norme=round(math.sqrt(norme),3)
+    return norme
+
+def similarité(vecteurA,vecteurB):
+    normeA=norme(vecteurA)
+    normeB=norme(vecteurB)
+    prod_sc=prod_scalaire(vecteurA,vecteurB)
+    simi=prod_sc/(normeA+normeB)
+    return simi
+
+def meilleur_doc(question)
+    
+   
     
 
 global Prenom_president
