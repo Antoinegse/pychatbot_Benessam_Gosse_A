@@ -2,7 +2,7 @@ import os
 import math
 
 ("IMPORTANT : pour les mots 'peu importants', nous avons décidé de leur affecter un score tf-idf de None, et non 0. C'est pour cela que dans la définition de la fonction "
- "idf, on calcule le logarithme sans ajouter +1.)")
+"idf, on calcule le logarithme sans ajouter +1.)")
  
 def cleaning_directory(dossier):
     """Fonction prenant en argument un dossier de fichiers et renvoyant ces fichiers dépourvus de ponctuation et de majuscules.
@@ -232,37 +232,38 @@ def recherche_corpus(question):
     return mot_corpus
 
 def vecteur_TF_IDF_question(question):
-    matrice_question=[[]for i in range(len(clean_directory))]
+    matrice_question=[]
     question=str(traitement(question))      
     mots_questions=Tokenisation(question)
     intersection=recherche_corpus(mots_questions)
     TF_question={}
     TF_question=fréquence(question,TF_question)
     for mot in TF_question.keys():
-        TF_question[mot]/=len(mots_questions)
+        TF_question[mot]=round(TF_question[mot]/len(mots_questions),3)
     Liste_clés=list(IDF.keys())    
     for i in range(len(Liste_clés)):
-        for j in range(len(clean_directory)):
-            if Liste_clés[i] in intersection:
-                matrice_question[j].append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
-            else:
-                matrice_question[j].append(0)
+        if Liste_clés[i] in intersection:
+            matrice_question.append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
+        else:
+            matrice_question.append(0)
     return matrice_question
 
-def transosée(matrice):
+def transposée(matrice):
     T_matrice=[[matrice[i][j] for i in range(len(matrice))] for j in range (len(matrice[0]))]
     return T_matrice
 
 def prod_scalaire(vecteurA,vecteurB):
     prod_sc=0
     for i in range(len(vecteurA)):
-        prod_sc+=round(vecteurA[i]*vecteurB[i],3)
+        if vecteurA[i]!=None and vecteurB[i]!=None:
+            prod_sc+=round(vecteurA[i]*vecteurB[i],3)
     return prod_sc
 
 def norme(vecteur):
     norme=0
     for score in vecteur:
-        norme+=score**2
+        if score!=None:
+            norme+=score**2
     norme=round(math.sqrt(norme),3)
     return norme
 
@@ -273,10 +274,24 @@ def similarité(vecteurA,vecteurB):
     simi=prod_sc/(normeA+normeB)
     return simi
 
-def meilleur_doc(question)
-    
-   
-    
+def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
+    matrice_TF_IDF=transposée(matrice_TF_IDF)
+    L_simi=[]
+    for ligne in matrice_TF_IDF:
+        L_simi.append(similarité(ligne,matrice_question))
+    max=L_simi[0]
+    indice=0
+    for i in range(1,len(L_simi)):
+        if L_simi[i]>max:
+            max=L_simi[i]
+            indice=i
+    nom=dossier[indice]
+    nom=clean_vers_normale(nom)
+    return nom
+           
+def clean_vers_normale(fichier):
+    return fichier[:-12]+fichier[-4:]
+       
 
 global Prenom_president
 Prenom_president = {"Chirac":"Jacques","Mitterrand":"François","Macron":"Emmanuel",
@@ -291,3 +306,5 @@ Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing'
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
+Matrice_question=vecteur_TF_IDF_question("Qui a parlé de republique ?")
+print(meilleur_doc(Matrice_TF_IDF,Matrice_question,clean_directory))
