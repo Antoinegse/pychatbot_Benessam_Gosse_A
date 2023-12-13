@@ -27,10 +27,9 @@ def traitement(line):
     for lettre in line:
         if lettre in ["à","è","é","ô","ù"]:
             str+=lettre
-        elif lettre in [".",",",";","?","!",":","-",'"',"`"]:
+        elif lettre in [".",",",";","?","!",":","-",'"',"`","'"]:
             str+=" "
-        elif lettre=="'":
-            str+="e "
+
         else:
             str+=lower(lettre)
     return str
@@ -227,27 +226,31 @@ def recherche_corpus(question):
             lignes = f.readlines()
             for ligne in lignes :
                 for mot in question:
-                     if mot in ligne:
+                     if mot in ligne and mot not in mot_corpus:
                          mot_corpus.append(mot)
     return mot_corpus
+
 
 def vecteur_TF_IDF_question(question):
     global D_question_tfidf
     D_question_tfidf = {}
-    matrice_question=[]
-    question=str(traitement(question))
-    mots_questions=Tokenisation(question)
-    intersection=recherche_corpus(mots_questions)
-    TF_question={}
-    TF_question=fréquence(question,TF_question)
-    Liste_clés=list(IDF.keys())
+    matrice_question = []
+    question = str(traitement(question))
+    mots_questions = Tokenisation(question)
+    intersection = recherche_corpus(mots_questions)
+    TF_question = {}
+    TF_question = fréquence(question, TF_question)
+    Liste_clés = list(IDF.keys())
+
     for i in range(len(Liste_clés)):
-        if Liste_clés[i] in intersection:
-            n = TF_question[Liste_clés[i]]*IDF[Liste_clés[i]]
-            matrice_question.append(n)
-            D_question_tfidf[n] = Liste_clés[i]
+        mot = Liste_clés[i]
+        if mot in intersection:
+            score_tfidf = TF_question[mot] * IDF[mot]
+            matrice_question.append(score_tfidf)
+            D_question_tfidf[mot] = score_tfidf
         else:
             matrice_question.append(0)
+
     return matrice_question
 
 def transposée(matrice):
@@ -276,53 +279,48 @@ def similarité(vecteurA,vecteurB):
     simi=prod_sc/(normeA+normeB)
     return simi
 
-#def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
-#    matrice_TF_IDF=transposée(matrice_TF_IDF)
-#    L_simi=[]
-#    for ligne in matrice_TF_IDF:
-#        L_simi.append(similarité(ligne,matrice_question))
-#    max=L_simi[0]
-#    indice=0
-#    for i in range(1,len(L_simi)):
-#        if L_simi[i]>max:
-#            max=L_simi[i]
-#            indice=i
-#    nom=dossier[indice]
-#    nom=clean_vers_normale(nom)
-#    return nom
            
 def clean_vers_normale(fichier):
     return fichier[:-12]+fichier[-4:]
 
-def find_key(v):
-    global D_question_tfidf
-    for k, val in D_question_tfidf.items():
-        if v == val:
-            return k
 
-def document_pertinent(matrice_TF_IDF,matrice_question,dossier):
+
+def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
     matrice_TF_IDF=transposée(matrice_TF_IDF)
     L_simi=[]
     for ligne in matrice_TF_IDF:
         L_simi.append(similarité(ligne,matrice_question))
-    for indice, valeur in enumerate(L_simi):
-        if valeur == max(L_simi):
-            indice_max = indice
-    nom=clean_vers_normale(dossier[indice_max])
+    max=L_simi[0]
+    indice=0
+    for i in range(1,len(L_simi)):
+        if L_simi[i]>max:
+            max=L_simi[i]
+            indice=i
+    print(indice)
+    nom=dossier[indice]
+    print(nom)
+    nom=clean_vers_normale(nom)
     return nom
 
 def réponse(question):
 
     vec_tf_idf_qst = vecteur_TF_IDF_question(question)
-    maxi = -float("inf")
+    maxi = 0
+    mots_maxis = []
     for i in range(len(vec_tf_idf_qst)):
-        print(vec_tf_idf_qst[i])
         if vec_tf_idf_qst[i]>=maxi :
             maxi = vec_tf_idf_qst[i]
+    for clé,valeur in D_question_tfidf.items():
+        if valeur == maxi :
+            mots_maxis.append(clé)
 
-    mot_max = D_question_tfidf[maxi]
+    doc_pertinent = meilleur_doc(Matrice_TF_IDF,vec_tf_idf_qst,"cleaned")
+    print(doc_pertinent)
 
-    return mot_max
+
+
+
+
 
 
 
@@ -347,6 +345,8 @@ Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing'
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
-Matrice_question=vecteur_TF_IDF_question("Qui a parlé de republique ?")
 #print(document_pertinent(Matrice_TF_IDF,Matrice_question,clean_directory))
-print(réponse("Peux-tu me dire comment une nation prend-elle soin du climat ?"))
+#print(réponse("aimes-tu les arbres ainsi que les femmes?"))
+
+print(meilleur_doc(Matrice_TF_IDF,vecteur_TF_IDF_question("Aimes-tu le climat ?"),"cleaned"))
+
