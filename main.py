@@ -1,5 +1,6 @@
 import os
 import math
+from xmlrpc.client import Boolean
 
 ("IMPORTANT : pour les mots 'peu importants', nous avons décidé de leur affecter un score tf-idf de None, et non 0. C'est pour cela que dans la définition de la fonction "
 "idf, on calcule le logarithme sans ajouter +1.)")
@@ -292,13 +293,23 @@ def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
         L_simi.append(similarité(ligne,matrice_question))
     max=L_simi[0]
     indice=0
+    noms=[]
     for i in range(1,len(L_simi)):
         if L_simi[i]>max:
             max=L_simi[i]
             indice=i
-    nom=dossier[indice]
-    nom=clean_vers_normale(nom)
-    return nom
+        elif L_simi[i]==max:
+            noms.append(indice)
+    if noms==[]:
+        nom=dossier[indice]
+        nom=clean_vers_normale(nom)
+        return [nom]
+    else:
+        noms=[indice]+noms
+        for i in range(len(noms)):
+            nom=dossier[noms[i]]
+            nom=clean_vers_normale(nom)
+        return noms
 
 def réponse(question):
 
@@ -313,30 +324,19 @@ def réponse(question):
             mots_maxis.append(clé)
 
     doc_pertinent = meilleur_doc(Matrice_TF_IDF,vec_tf_idf_qst,clean_directory)
-
+    print(doc_pertinent)
     reponse = []
-
-    for e in mots_maxis:
-        with open("speeches-20231108/"+doc_pertinent, "r", encoding = "UTF-8") as doc :
-            #lignes = doc.readlines()
-            #discours = ""
-            #for ligne in lignes:
-            #    discours+=ligne
-            #for line in discours.split("."):
-            #    if e in line:
-            #        reponse.append(ligne)
-            #        break
-
+    Booleen=True
+    for i in range(len(doc_pertinent)):
+        with open("speeches-20231108/"+str(doc_pertinent[i]), "r", encoding = "UTF-8") as doc :
             for ligne in doc:
-                # Diviser la ligne en phrases délimitées par deux points
-                phrases = ligne.split('.')
-
-                # Rechercher le mot dans chaque phrase
+                phrases=ligne.split(".")
                 for phrase in phrases:
-                    if e in phrase:
+                    if mots_maxis[i] in phrase and Booleen:
                         reponse.append(phrase.strip())
-                        break
-            break
+                        Booleen=False
+                        
+                    
     return reponse
 
 
