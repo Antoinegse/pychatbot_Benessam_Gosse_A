@@ -296,9 +296,7 @@ def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
         if L_simi[i]>max:
             max=L_simi[i]
             indice=i
-    print(indice)
     nom=dossier[indice]
-    print(nom)
     nom=clean_vers_normale(nom)
     return nom
 
@@ -314,8 +312,34 @@ def réponse(question):
         if valeur == maxi :
             mots_maxis.append(clé)
 
-    doc_pertinent = meilleur_doc(Matrice_TF_IDF,vec_tf_idf_qst,"cleaned")
-    print(doc_pertinent)
+    doc_pertinent = meilleur_doc(Matrice_TF_IDF,vec_tf_idf_qst,clean_directory)
+
+    reponse = []
+
+    for e in mots_maxis:
+        with open("speeches-20231108/"+doc_pertinent, "r", encoding = "UTF-8") as doc :
+            #lignes = doc.readlines()
+            #discours = ""
+            #for ligne in lignes:
+            #    discours+=ligne
+            #for line in discours.split("."):
+            #    if e in line:
+            #        reponse.append(ligne)
+            #        break
+
+            for ligne in doc:
+                # Diviser la ligne en phrases délimitées par deux points
+                phrases = ligne.split('.')
+
+                # Rechercher le mot dans chaque phrase
+                for phrase in phrases:
+                    if e in phrase:
+                        reponse.append(phrase.strip())
+                        break
+            break
+    return reponse
+
+
 
 
 
@@ -346,7 +370,7 @@ Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
 #print(document_pertinent(Matrice_TF_IDF,Matrice_question,clean_directory))
-#print(réponse("aimes-tu les arbres ainsi que les femmes?"))
+print(réponse("Comment-une nation prend-elle soin du climat ?"))
 
-print(meilleur_doc(Matrice_TF_IDF,vecteur_TF_IDF_question("Aimes-tu le climat ?"),"cleaned"))
+
 
