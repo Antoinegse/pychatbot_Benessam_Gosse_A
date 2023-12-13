@@ -232,6 +232,8 @@ def recherche_corpus(question):
     return mot_corpus
 
 def vecteur_TF_IDF_question(question):
+    global D_question_tfidf
+    D_question_tfidf = {}
     matrice_question=[]
     question=str(traitement(question))      
     mots_questions=Tokenisation(question)
@@ -240,10 +242,13 @@ def vecteur_TF_IDF_question(question):
     TF_question=fréquence(question,TF_question)
     for mot in TF_question.keys():
         TF_question[mot]=round(TF_question[mot]/len(mots_questions),3)
-    Liste_clés=list(IDF.keys())    
+        D_question_tfidf[mot] = 0
+    Liste_clés=list(IDF.keys())
     for i in range(len(Liste_clés)):
         if Liste_clés[i] in intersection:
-            matrice_question.append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
+            n = TF_question[Liste_clés[i]]*IDF[Liste_clés[i]]
+            matrice_question.append(n)
+            D_question_tfidf[mot] = n
         else:
             matrice_question.append(0)
     return matrice_question
@@ -292,7 +297,6 @@ def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
 def clean_vers_normale(fichier):
     return fichier[:-12]+fichier[-4:]
 
-from main import *
 def find_key(v):
     global D_question_tfidf
     for k, val in D_question_tfidf.items():
@@ -338,7 +342,7 @@ def réponse(question):
     print("La phrase contenant le mot avec le TF-IDF le plus élevé est :", phrase_contenant_mot)
 
 réponse("Peux-tu me dire comment une nation prend-elle soin du climat ?")
-       
+
 
 global Prenom_president
 Prenom_president = {"Chirac":"Jacques","Mitterrand":"François","Macron":"Emmanuel",
