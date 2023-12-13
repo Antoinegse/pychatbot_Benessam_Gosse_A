@@ -235,20 +235,17 @@ def vecteur_TF_IDF_question(question):
     global D_question_tfidf
     D_question_tfidf = {}
     matrice_question=[]
-    question=str(traitement(question))      
+    question=str(traitement(question))
     mots_questions=Tokenisation(question)
     intersection=recherche_corpus(mots_questions)
     TF_question={}
     TF_question=fréquence(question,TF_question)
-    for mot in TF_question.keys():
-        TF_question[mot]=round(TF_question[mot]/len(mots_questions),3)
-        D_question_tfidf[mot] = 0
     Liste_clés=list(IDF.keys())
     for i in range(len(Liste_clés)):
         if Liste_clés[i] in intersection:
             n = TF_question[Liste_clés[i]]*IDF[Liste_clés[i]]
             matrice_question.append(n)
-            D_question_tfidf[mot] = n
+            D_question_tfidf[n] = Liste_clés[i]
         else:
             matrice_question.append(0)
     return matrice_question
@@ -279,20 +276,20 @@ def similarité(vecteurA,vecteurB):
     simi=prod_sc/(normeA+normeB)
     return simi
 
-def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
-    matrice_TF_IDF=transposée(matrice_TF_IDF)
-    L_simi=[]
-    for ligne in matrice_TF_IDF:
-        L_simi.append(similarité(ligne,matrice_question))
-    max=L_simi[0]
-    indice=0
-    for i in range(1,len(L_simi)):
-        if L_simi[i]>max:
-            max=L_simi[i]
-            indice=i
-    nom=dossier[indice]
-    nom=clean_vers_normale(nom)
-    return nom
+#def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
+#    matrice_TF_IDF=transposée(matrice_TF_IDF)
+#    L_simi=[]
+#    for ligne in matrice_TF_IDF:
+#        L_simi.append(similarité(ligne,matrice_question))
+#    max=L_simi[0]
+#    indice=0
+#    for i in range(1,len(L_simi)):
+#        if L_simi[i]>max:
+#            max=L_simi[i]
+#            indice=i
+#    nom=dossier[indice]
+#    nom=clean_vers_normale(nom)
+#    return nom
            
 def clean_vers_normale(fichier):
     return fichier[:-12]+fichier[-4:]
@@ -311,37 +308,30 @@ def document_pertinent(matrice_TF_IDF,matrice_question,dossier):
     for indice, valeur in enumerate(L_simi):
         if valeur == max(L_simi):
             indice_max = indice
-            maxi = valeur
     nom=clean_vers_normale(dossier[indice_max])
     return nom
 
 def réponse(question):
 
-    global D_question_tfidf
-    # Trouver le mot avec le score TF-IDF le plus élevé
-    vec_tf_idf = vecteur_TF_IDF_question(question)
+    vec_tf_idf_qst = vecteur_TF_IDF_question(question)
+    maxi = -float("inf")
+    for i in range(len(vec_tf_idf_qst)):
+        print(vec_tf_idf_qst[i])
+        if vec_tf_idf_qst[i]>=maxi :
+            maxi = vec_tf_idf_qst[i]
 
-    indice_max_tfidf = max(range(len(vec_tf_idf)), key=vec_tf_idf.__getitem__)
-    # Récupérer le mot avec le score TF-IDF le plus élevé
-    mot_max_tfidf = find_key(indice_max_tfidf)
+    mot_max = D_question_tfidf[maxi]
 
-    # Supposons que vous ayez déjà le document pertinent retourné dans l'étape 5 sous forme de chaîne de caractères.
-    doc_pertinent = document_pertinent(Matrice_TF_IDF,Matrice_question,"cleaned")
+    return mot_max
 
-    # Trouver la première occurrence du mot dans le document
-    indice_occurrence = doc_pertinent.find(mot_max_tfidf)
 
-    # Trouver la phrase qui contient le mot
-    debut_phrase = doc_pertinent.rfind(".", 0, indice_occurrence) + 1
-    fin_phrase = doc_pertinent.find(".", indice_occurrence)
 
-    # Extraire la phrase
-    phrase_contenant_mot = document_pertinent[debut_phrase:fin_phrase].strip()
 
-    # Afficher la phrase résultante
-    print("La phrase contenant le mot avec le TF-IDF le plus élevé est :", phrase_contenant_mot)
 
-réponse("Peux-tu me dire comment une nation prend-elle soin du climat ?")
+
+
+
+
 
 
 global Prenom_president
@@ -352,10 +342,11 @@ clean_directory=os.listdir(r'cleaned')
 global liste_TF
 liste_TF=[{},{},{},{},{},{},{},{}]
 global IDF
-IDF={}
+IDF = {}
 Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing', 'François Hollande', 'Emmanuel Macron', 'François Mitterrand', 'Nicolas Sarkozy']
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
 Matrice_question=vecteur_TF_IDF_question("Qui a parlé de republique ?")
-print(meilleur_doc(Matrice_TF_IDF,Matrice_question,clean_directory))
+#print(document_pertinent(Matrice_TF_IDF,Matrice_question,clean_directory))
+print(réponse("Peux-tu me dire comment une nation prend-elle soin du climat ?"))
