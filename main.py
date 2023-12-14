@@ -1,3 +1,4 @@
+from ast import Break
 import os
 import math
 from xmlrpc.client import Boolean
@@ -293,50 +294,35 @@ def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
         L_simi.append(similarité(ligne,matrice_question))
     max=L_simi[0]
     indice=0
-    noms=[]
     for i in range(1,len(L_simi)):
         if L_simi[i]>max:
             max=L_simi[i]
             indice=i
-        elif L_simi[i]==max:
-            noms.append(indice)
-    if noms==[]:
-        nom=dossier[indice]
-        nom=clean_vers_normale(nom)
-        return [nom]
-    else:
-        noms=[indice]+noms
-        for i in range(len(noms)):
-            nom=dossier[noms[i]]
-            nom=clean_vers_normale(nom)
-        return noms
+    nom=dossier[indice]
+    nom=clean_vers_normale(nom)
+    return nom
 
 def réponse(question):
 
     vec_tf_idf_qst = vecteur_TF_IDF_question(question)
     maxi = 0
-    mots_maxis = []
+    mots_maxis = ""
     for i in range(len(vec_tf_idf_qst)):
-        if vec_tf_idf_qst[i]>=maxi :
+        if vec_tf_idf_qst[i]>maxi :
             maxi = vec_tf_idf_qst[i]
     for clé,valeur in D_question_tfidf.items():
         if valeur == maxi :
-            mots_maxis.append(clé)
-
+            mots_maxis=clé
+            break
     doc_pertinent = meilleur_doc(Matrice_TF_IDF,vec_tf_idf_qst,clean_directory)
-    print(doc_pertinent)
-    reponse = []
-    Booleen=True
-    for i in range(len(doc_pertinent)):
-        with open("speeches-20231108/"+str(doc_pertinent[i]), "r", encoding = "UTF-8") as doc :
-            for ligne in doc:
-                phrases=ligne.split(".")
-                for phrase in phrases:
-                    if mots_maxis[i] in phrase and Booleen:
-                        reponse.append(phrase.strip())
-                        Booleen=False
-                        
-                    
+    reponse = ""
+    with open("speeches-20231108/"+doc_pertinent, "r", encoding = "UTF-8") as doc :
+        for ligne in doc:
+            phrases=ligne.split(".")
+            for phrase in phrases:
+                if mots_maxis in phrase:
+                    reponse=phrase.strip()
+                    break             
     return reponse
 
 
