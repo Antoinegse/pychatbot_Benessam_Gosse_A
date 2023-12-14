@@ -1,5 +1,7 @@
+from ast import Break
 import os
 import math
+from xmlrpc.client import Boolean
 
 ("IMPORTANT : pour les mots 'peu importants', nous avons décidé de leur affecter un score tf-idf de None, et non 0. C'est pour cela que dans la définition de la fonction "
 "idf, on calcule le logarithme sans ajouter +1.)")
@@ -27,10 +29,9 @@ def traitement(line):
     for lettre in line:
         if lettre in ["à","è","é","ô","ù"]:
             str+=lettre
-        elif lettre in [".",",",";","?","!",":","-",'"',"`"]:
+        elif lettre in [".",",",";","?","!",":","-",'"',"`","'"]:
             str+=" "
-        elif lettre=="'":
-            str+="e "
+
         else:
             str+=lower(lettre)
     return str
@@ -227,25 +228,31 @@ def recherche_corpus(question):
             lignes = f.readlines()
             for ligne in lignes :
                 for mot in question:
-                     if mot in ligne:
+                     if mot in ligne and mot not in mot_corpus:
                          mot_corpus.append(mot)
     return mot_corpus
 
+
 def vecteur_TF_IDF_question(question):
-    matrice_question=[]
-    question=str(traitement(question))      
-    mots_questions=Tokenisation(question)
-    intersection=recherche_corpus(mots_questions)
-    TF_question={}
-    TF_question=fréquence(question,TF_question)
-    for mot in TF_question.keys():
-        TF_question[mot]=round(TF_question[mot]/len(mots_questions),3)
-    Liste_clés=list(IDF.keys())    
+    global D_question_tfidf
+    D_question_tfidf = {}
+    matrice_question = []
+    question = str(traitement(question))
+    mots_questions = Tokenisation(question)
+    intersection = recherche_corpus(mots_questions)
+    TF_question = {}
+    TF_question = fréquence(question, TF_question)
+    Liste_clés = list(IDF.keys())
+
     for i in range(len(Liste_clés)):
-        if Liste_clés[i] in intersection:
-            matrice_question.append(TF_question[Liste_clés[i]]*IDF[Liste_clés[i]])
+        mot = Liste_clés[i]
+        if mot in intersection:
+            score_tfidf = TF_question[mot] * IDF[mot]
+            matrice_question.append(score_tfidf)
+            D_question_tfidf[mot] = score_tfidf
         else:
             matrice_question.append(0)
+
     return matrice_question
 
 def transposée(matrice):
@@ -274,6 +281,12 @@ def similarité(vecteurA,vecteurB):
     simi=prod_sc/(normeA+normeB)
     return simi
 
+           
+def clean_vers_normale(fichier):
+    return fichier[:-12]+fichier[-4:]
+
+
+
 def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
     matrice_TF_IDF=transposée(matrice_TF_IDF)
     L_simi=[]
@@ -288,10 +301,46 @@ def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
     nom=dossier[indice]
     nom=clean_vers_normale(nom)
     return nom
-           
-def clean_vers_normale(fichier):
-    return fichier[:-12]+fichier[-4:]
-       
+
+def réponse(question):
+
+    vec_tf_idf_qst = vecteur_TF_IDF_question(question)
+    maxi = 0
+    mots_maxis = ""
+    for i in range(len(vec_tf_idf_qst)):
+        if vec_tf_idf_qst[i]>maxi :
+            maxi = vec_tf_idf_qst[i]
+    for clé,valeur in D_question_tfidf.items():
+        if valeur == maxi :
+            mots_maxis=clé
+            break
+    doc_pertinent = meilleur_doc(Matrice_TF_IDF,vec_tf_idf_qst,clean_directory)
+    reponse = ""
+    with open("speeches-20231108/"+doc_pertinent, "r", encoding = "UTF-8") as doc :
+        for ligne in doc:
+            phrases=ligne.split(".")
+            for phrase in phrases:
+                if mots_maxis in phrase:
+                    reponse=phrase.strip()
+                    break             
+    return reponse
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 global Prenom_president
 Prenom_president = {"Chirac":"Jacques","Mitterrand":"François","Macron":"Emmanuel",
@@ -301,10 +350,13 @@ clean_directory=os.listdir(r'cleaned')
 global liste_TF
 liste_TF=[{},{},{},{},{},{},{},{}]
 global IDF
-IDF={}
+IDF = {}
 Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing', 'François Hollande', 'Emmanuel Macron', 'François Mitterrand', 'Nicolas Sarkozy']
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
-Matrice_question=vecteur_TF_IDF_question("Qui a parlé de republique ?")
-print(meilleur_doc(Matrice_TF_IDF,Matrice_question,clean_directory))
+#print(document_pertinent(Matrice_TF_IDF,Matrice_question,clean_directory))
+print(réponse("Comment-une nation prend-elle soin du climat ?"))
+
+
+
