@@ -321,7 +321,7 @@ def réponse(question):
             phrases=ligne.split(".")
             for phrase in phrases:
                 if mots_maxis in phrase:
-                    reponse=phrase.strip()
+                    reponse=phrase
                     break             
     return reponse
 
@@ -356,7 +356,7 @@ Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
 #print(document_pertinent(Matrice_TF_IDF,Matrice_question,clean_directory))
-print(réponse("Comment-une nation prend-elle soin du climat ?"))
+#print(réponse("Comment-une nation prend-elle soin du climat ?"))
 
 
 

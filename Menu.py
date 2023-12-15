@@ -1,8 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter.messagebox import QUESTION
 from main import*
 
-Liste_fonctions=["Liste des noms des présidents","Liste des mots les moins importants","Mots ayant le score TF-IDF le plus élevé","Mots les plus répétés par le président Chirac","Présidents qui ont parlé de la Nation et celui qui en a le plus parlé","Quel est le premier président a avoir parlé d'écologie ?","Quels sont les mots que tous les présidents ont évoqués"]
+Liste_fonctions=["Liste des noms des présidents","Liste des mots les moins importants","Mots ayant le score TF-IDF le plus élevé","Mots les plus répétés par le président Chirac","Présidents qui ont parlé de la Nation et celui qui en a le plus parlé","Quel est le premier président a avoir parlé d'écologie ?","Quels sont les mots que tous les présidents ont évoqués","Réponse à une question"]
 n=len(Liste_fonctions)
 
 class InterfaceGraphique:
@@ -53,6 +53,11 @@ class InterfaceGraphique:
         # Utilisation d'un widget de texte pour le rendu
         self.texte_rendu = tk.Text(self.cadre_droite, wrap=tk.WORD, font=("Helvetica", 16))
         self.texte_rendu.pack(pady=50, padx=50)
+        
+        # Création attributs pour récupérer la question entrée par l'utilisateur et voir quand l'utilisateur a saisi une réponse
+        self.rep=""
+        self.bool=False
+        self.reponse=None
 
     def action_bouton(self, numero_bouton):
         """Fonction attribuant à chaque bouton une action associée à une fonctionnalité"""
@@ -105,12 +110,46 @@ class InterfaceGraphique:
                     resultat+=text[i]+" "+text[i+1]+" "+text[i+2]+" "+text[i+3]+"\n"
                 indice=i
             for j in range(len(text)-indice-4):
-                resultat+=text[indice-4+j]+" " 
+                resultat+=text[indice-4+j]+" "
+        elif numero_bouton==8 :
+            
+            self.create()
+            while not self.bool:
+                self.fenetre.update()
+            question=str(self.rep)
+            self.reponse.destroy()
+            self.bool=False
+            resultat=réponse(question)+"."
+             
         self.texte_rendu.delete("1.0", tk.END)  
         self.texte_rendu.insert(tk.END, resultat)
 
     def quitter(self):
         self.fenetre.destroy()
+    
+    def create(self):
+        if self.reponse is None or not self.reponse.winfo_exists():
+            self.reponse = tk.Toplevel(self.fenetre)
+            self.reponse.tk.call('tk::PlaceWindow', self.reponse, 'center')
+            self.reponse.geometry("305x200")
+            question=tk.StringVar()
+            Champ_entree=tk.Entry(self.reponse,highlightthickness=2,highlightbackground="black",textvariable=question,width=45)
+            espace=tk.Label(self.reponse)
+            espace2=tk.Label(self.reponse)
+            titre=tk.Label(self.reponse,text="Entrez une question :")
+            espace2.pack(expand=True,side=tk.BOTTOM)
+            espace.pack(expand=True)
+            titre.pack()
+            Champ_entree.pack()
+            Champ_entree.bind("<Return>", lambda event: self.recuperer_et_fermer(question))
+        
+    def recuperer_et_fermer(self, question_variable):
+        self.rep = question_variable.get()
+        self.bool=True
+        self.reponse.destroy()
+        self.action_bouton(8)
+        
+        
 
 fenetre_principale = tk.Tk()
 interface = InterfaceGraphique(fenetre_principale)
