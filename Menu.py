@@ -122,7 +122,6 @@ class InterfaceGraphique:
 
             # Obtenir le premier mot de la question
             premier_mot_question = question.split()[0]
-
             # Obtenir la réponse
             resultat = réponse(question) + "."
 
@@ -133,8 +132,6 @@ class InterfaceGraphique:
             if premier_mot_question.capitalize() in question_starters:
                 # Utiliser le préfixe correspondant
                 resultat = question_starters[premier_mot_question.capitalize()] + ' ' + resultat
-
-            question_starters = {"Comment": "Après analyse, ", "Pourquoi": "Car, ", "Peux-tu": "Oui, bien sûr!"}
              
         self.texte_rendu.delete("1.0", tk.END)  
         self.texte_rendu.insert(tk.END, resultat)
