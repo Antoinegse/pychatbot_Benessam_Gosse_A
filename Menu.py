@@ -113,7 +113,7 @@ class InterfaceGraphique:
                 resultat+=text[indice-4+j]+" "
         elif numero_bouton==8 :
             
-            self.create()
+            self.creer()
             while not self.bool:
                 self.fenetre.update()
             question=str(self.rep)
@@ -142,7 +142,7 @@ class InterfaceGraphique:
     def quitter(self):
         self.fenetre.destroy()
     
-    def create(self):
+    def creer(self):
         if self.reponse is None or not self.reponse.winfo_exists():
             self.reponse = tk.Toplevel(self.fenetre)
             self.reponse.tk.call('tk::PlaceWindow', self.reponse, 'center')

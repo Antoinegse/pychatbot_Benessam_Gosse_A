@@ -6,7 +6,7 @@ from xmlrpc.client import Boolean
 ("IMPORTANT : pour les mots 'peu importants', nous avons décidé de leur affecter un score tf-idf de None, et non 0. C'est pour cela que dans la définition de la fonction "
 "idf, on calcule le logarithme sans ajouter +1.)")
  
-def cleaning_directory(dossier):
+def dossier_clean(dossier):
     """Fonction prenant en argument un dossier de fichiers et renvoyant ces fichiers dépourvus de ponctuation et de majuscules.
      -> list"""
     global directory
@@ -33,10 +33,10 @@ def traitement(line):
             str+=" "
 
         else:
-            str+=lower(lettre)
+            str+=minuscule(lettre)
     return str
 
-def lower(lettre:str):
+def minuscule(lettre:str):
     """Fonction prenant en argument une lettre et renvoyant cette même lettre si c'est une minuscule, ou son équivalent en minuscule si c'est une majuscule."""
     if 65<=ord(lettre)<=90 or 192<=ord(lettre)<=223:
         return chr(ord(lettre)+32)
@@ -301,6 +301,7 @@ def similarité(vecteurA,vecteurB):
 
            
 def clean_vers_normale(fichier):
+    """Fonction qui renvoie le fichier de départ par rapport au fichier traité. """
     return fichier[:-12]+fichier[-4:]
 
 
@@ -389,7 +390,7 @@ global IDF
 IDF = {}
 Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing', 'François Hollande', 'Emmanuel Macron', 'François Mitterrand', 'Nicolas Sarkozy']
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
-Liste_nom_president=cleaning_directory("speeches-20231108")
+Liste_nom_president=dossier_clean("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
 
 
