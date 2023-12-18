@@ -156,7 +156,7 @@ def mot_repetes_par_Chirac(matrice):
 def president_parle_Nation(matrice):
     """Fonction prenant en argument une matrice, la parcourant et renvoyant le nom des présidents ayant prononcé
        le mot "nation" ainsi que le nom de celui qui l'a plus répété.
-       -> """
+       -> list, str"""
     liste_mots=list(IDF.keys())
     liste_président=[]
     president_qui_a_plus_de_nation=""
@@ -214,12 +214,16 @@ def mots_evoques_par_tous(matrice:list):
     return Liste_mot_evoques
 
 def Tokenisation(question):
+    """Fonction séparant les mots de la question donnée et les retournant sous forme de liste
+       -> list"""
     mots_question = []
     for mot in question.split():
         mots_question.append(mot)
     return mots_question
 
 def recherche_corpus(question):
+    """Fonction qui cherche les mots de la question qui sont dans le corpus de documents
+       -> list"""
     mot_corpus=[]
     dossier = "cleaned"
     fichiers = os.listdir(dossier)
@@ -234,7 +238,12 @@ def recherche_corpus(question):
 
 
 def vecteur_TF_IDF_question(question):
+    """Fonction qui calcule le score TF-IDF de chaque mot de la question et renvoie le tout dans une liste
+       -> list"""
+    # Utilisation de la variable globale pour stocker le dictionnaire TF-IDF de la question
     global D_question_tfidf
+
+    # Initialisation du dictionnaire TF-IDF de la question
     D_question_tfidf = {}
     matrice_question = []
     question = str(traitement(question))
@@ -244,6 +253,7 @@ def vecteur_TF_IDF_question(question):
     TF_question = fréquence(question, TF_question)
     Liste_clés = list(IDF.keys())
 
+    # Parcours des clés IDF pour construire le vecteur TF-IDF de la question
     for i in range(len(Liste_clés)):
         mot = Liste_clés[i]
         if mot in intersection:
@@ -256,10 +266,14 @@ def vecteur_TF_IDF_question(question):
     return matrice_question
 
 def transposée(matrice):
+    """Fonction calculant la transposée d'une matrice
+       -> list"""
     T_matrice=[[matrice[i][j] for i in range(len(matrice))] for j in range (len(matrice[0]))]
     return T_matrice
 
 def prod_scalaire(vecteurA,vecteurB):
+    """Fonction calculant le produit scalaire de deux vecteurs
+       -> float"""
     prod_sc=0
     for i in range(len(vecteurA)):
         if vecteurA[i]!=None and vecteurB[i]!=None:
@@ -267,6 +281,8 @@ def prod_scalaire(vecteurA,vecteurB):
     return prod_sc
 
 def norme(vecteur):
+    """Fonction calculant la norme d'un vecteur
+       -> float"""
     norme=0
     for score in vecteur:
         if score!=None:
@@ -275,6 +291,8 @@ def norme(vecteur):
     return norme
 
 def similarité(vecteurA,vecteurB):
+    """Fonction calculant la similarité de deux vecteurs
+       -> float"""
     normeA=norme(vecteurA)
     normeB=norme(vecteurB)
     prod_sc=prod_scalaire(vecteurA,vecteurB)
@@ -287,57 +305,75 @@ def clean_vers_normale(fichier):
 
 
 
-def meilleur_doc(matrice_TF_IDF,matrice_question,dossier):
-    matrice_TF_IDF=transposée(matrice_TF_IDF)
-    L_simi=[]
+def meilleur_doc(matrice_TF_IDF, matrice_question, dossier):
+    """Fonction renvoyant le document le plus pertinent par rapport à la question posée
+       -> str"""
+    # Transposer la matrice TF-IDF
+    matrice_TF_IDF = transposée(matrice_TF_IDF)
+
+    # Liste pour stocker les similarités entre chaque document et la question
+    L_simi = []
+
+    # Calculer la similarité entre chaque document et la question
     for ligne in matrice_TF_IDF:
-        L_simi.append(similarité(ligne,matrice_question))
-    max=L_simi[0]
-    indice=0
-    for i in range(1,len(L_simi)):
-        if L_simi[i]>max:
-            max=L_simi[i]
-            indice=i
-    nom=dossier[indice]
-    nom=clean_vers_normale(nom)
-    return nom
+        L_simi.append(similarité(ligne, matrice_question))
+
+    # Initialisation des variables pour le document le plus similaire
+    max_similarite = L_simi[0]
+    indice_max_similarite = 0
+
+    # Trouver le document avec la similarité maximale
+    for i in range(1, len(L_simi)):
+        if L_simi[i] > max_similarite:
+            max_similarite = L_simi[i]
+            indice_max_similarite = i
+
+    nom_document = dossier[indice_max_similarite]
+    nom_document = clean_vers_normale(nom_document)
+
+    return nom_document
+
 
 def réponse(question):
-
+    """Fonction construisant une réponse 'intelligible', qui apporte des informations quant à la question posée par l'utilisateur"""
+    # Calcul du vecteur TF-IDF de la question
     vec_tf_idf_qst = vecteur_TF_IDF_question(question)
+
+    # Recherche du terme le plus significatif dans le vecteur TF-IDF de la question
     maxi = 0
     mots_maxis = ""
     for i in range(len(vec_tf_idf_qst)):
-        if vec_tf_idf_qst[i]>maxi :
+        if vec_tf_idf_qst[i] > maxi:
             maxi = vec_tf_idf_qst[i]
-    for clé,valeur in D_question_tfidf.items():
-        if valeur == maxi :
-            mots_maxis=clé
+    for clé, valeur in D_question_tfidf.items():
+        if valeur == maxi:
+            mots_maxis = clé
             break
-    doc_pertinent = meilleur_doc(Matrice_TF_IDF,vec_tf_idf_qst,clean_directory)
+
+    # Obtention du document le plus pertinent
+    doc_pertinent = meilleur_doc(Matrice_TF_IDF, vec_tf_idf_qst, clean_directory)
+
     reponse = ""
-    with open("speeches-20231108/"+doc_pertinent, "r", encoding = "UTF-8") as doc :
+
+    # Ouverture du document pertinent
+    with open("speeches-20231108/" + doc_pertinent, "r", encoding="UTF-8") as doc:
+        # Itération sur chaque ligne du document
         for ligne in doc:
-            phrases=ligne.split(".")
+            # Division de la ligne en phrases
+            phrases = ligne.split(".")
+
+            # Recherche du terme le plus significatif dans chaque phrase
             for phrase in phrases:
                 if mots_maxis in phrase:
-                    reponse=phrase
-                    break             
+                    reponse = phrase
+                    break
+
+            # Si la réponse est trouvée, sortir de la boucle externe également
+            if reponse:
+                break
+
+    # Renvoi de la première phrase du document contenant le terme le plus significatif
     return reponse
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -355,8 +391,7 @@ Liste_nom_fichier=['Jacques Chirac','Jacques Chirac', 'Valéry Giscard dEstaing'
 Liste_années_textes=[1995,2002,1974,2012,2017,1981,1988,2007]
 Liste_nom_president=cleaning_directory("speeches-20231108")
 Matrice_TF_IDF=TF_IDF(clean_directory)
-#print(document_pertinent(Matrice_TF_IDF,Matrice_question,clean_directory))
-#print(réponse("Comment-une nation prend-elle soin du climat ?"))
+
 
 
 
