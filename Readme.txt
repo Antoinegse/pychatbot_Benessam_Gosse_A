@@ -1,3 +1,5 @@
+https://github.com/Zestellar/pychatbot_Benessam_Gosse_A
+
 # La partie 1 de ce projet a été réalisée collaborativement hors Git puis publiée d'un coup sur le site
 
 Gosse Antoine   Benessam Imrân
